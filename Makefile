@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g -O3 -std=c17 -pipe -Wextra -Wpedantic -march=native
 RM = rm -f
-TARGET = pwdmgr
+TARGET = apm
 SOURCES = main.c utils.c
 HEADERS = utils.h
 OBJECTS = $(SOURCES:.c=.o)
