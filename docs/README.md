@@ -5,13 +5,13 @@ to not only store but generate passwords, delete, name, as well as search them
 efficiently.
 
 ## Installation
+
+Be sure to have CMake installed to install properly
 ```bash
+cmake -S ./
+cmake -B bin/
 make
 ```
-```bash
-make clean
-```
-
 ## Usage
 Use this command to learn all the others.
 ```bash
