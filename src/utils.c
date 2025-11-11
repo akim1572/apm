@@ -11,7 +11,7 @@ int findPassword(char* name) {
         char cur_name[strlen(name)];
         int line_num = 0;
         FILE* passes;
-        passes = fopen("/usr/local/bin/passwords", "r");
+        passes = fopen("~/.config/mpa/passwords", "r");
 
         while (fgets(cur_line, BUFFER, passes) != NULL) {
                 line_num++;
@@ -31,7 +31,7 @@ int findPassword(char* name) {
 }
 
 void checkMasterPassword() {
-        char master_pass[] = "/usr/local/bin/mass_pass";
+        char master_pass[] = "~/.config/mpa/mass_pass";
 
         if (access(master_pass, F_OK) != 0) {
                 setMasterPassword();
@@ -51,7 +51,7 @@ void checkMasterPassword() {
         verify_pass = verify_pass2;
         // get pass from file
         FILE* mass_file;
-        mass_file = fopen("/usr/local/bin/mass_pass", "r");
+        mass_file = fopen("~/.config/mpa/mass_pass", "r");
         char* the_truth = (char*)malloc(32 * sizeof(char));
 
         testAllocation(the_truth);
@@ -120,8 +120,8 @@ void deletePassword(int line_num) {
         int cur_num = 0;
         FILE* old;
         FILE* new;
-        old = fopen("/usr/local/bin/passwords", "r");
-        new = fopen("/usr/local/bin/passwords2", "w");
+        old = fopen("~/.config/mpa/passwords", "r");
+        new = fopen("~/.config/mpa/passwords2", "w");
 
         while (fgets(cur_line, BUFFER, old) != NULL) {
                 cur_num++;
@@ -134,12 +134,12 @@ void deletePassword(int line_num) {
 
         fclose(old);
         fclose(new);
-        remove("/usr/local/bin/passwords");
-        rename("/usr/local/bin/passwords2", "usr/local/bin/passwords");
+        remove("~/.config/mpa/passwords");
+        rename("~/.config/mpa/passwords2", "~/.config/mpa/passwords");
 }
 
 void listPasswords() {
-        char pass_file[] = "/usr/local/bin/passwords";
+        char pass_file[] = "~/.config/mpa/passwords";
         char buffer[BUFFER];
 
         if (access(pass_file, F_OK) != 0) {
@@ -173,7 +173,7 @@ void setMasterPassword() {
         
         master_pass = master_pass2;
         FILE* mass_pass;
-        mass_pass = fopen("/usr/local/bin/mass_pass", "w");
+        mass_pass = fopen("~/.config/mpa/mass_pass", "w");
         
         fputs(master_pass, mass_pass);
         fclose(mass_pass);
@@ -182,7 +182,7 @@ void setMasterPassword() {
 
 void storePassword(char* name, char* pwd) {
         FILE* password_file;
-        password_file = fopen("/usr/local/bin/passwords", "a");
+        password_file = fopen("~/.config/mpa/passwords", "a");
 
         if (password_file == NULL) {
                 printf("Error storing password, exiting program\n");
