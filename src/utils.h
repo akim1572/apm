@@ -1,19 +1,6 @@
-#ifndef UTILS_H
-#define UTILS_H
+#define PWD_SIZE 16
+#define MAX_STRING 256
 
-#define BUFFER 50
-#define MAJOR 0
-#define MINOR 5
-#define PATCH 0
-#define PWD_SIZE 18
-
-int findPassword(char* name);
-void checkMasterPassword();
-void createPassword();
-void deletePassword(int line_num);
+char* createPassword();
 void listPasswords();
-void setMasterPassword();
-void storePassword(char* name, char* pwd);
-void testAllocation(char* test_var);
-
-#endif
+void storePassword(char* name, char* password);

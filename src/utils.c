@@ -1,206 +1,91 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <time.h>
 #include <unistd.h>
 
 #include "utils.h"
 
-int findPassword(char* name) {
-        char cur_line[BUFFER];
-        char cur_name[strlen(name)];
-        int line_num = 0;
-        FILE* passes;
-        passes = fopen("~/.config/mpa/passwords", "r");
+char* createPassword() {
+        const char LETTERS[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const char NUMBERS[] = "1f234567890";
+        const char SPECIALS[] = "!@#$%^&*()";
+        char* password = (char*)malloc(PWD_SIZE * sizeof(char));
+        int random = rand() % 3;
 
-        while (fgets(cur_line, BUFFER, passes) != NULL) {
-                line_num++;
-
-                for (size_t i = 0; i < strlen(name); i++) {
-                        cur_name[i] = cur_line[i];
-                }
-
-                if (strcmp(cur_name, name) == 0) {
-                        fclose(passes);
-                        return line_num;
-                }
-        }
-
-        fclose(passes);
-        return -1;
-}
-
-void checkMasterPassword() {
-        char master_pass[] = "~/.config/mpa/mass_pass";
-
-        if (access(master_pass, F_OK) != 0) {
-                setMasterPassword();
-        }
-
-        // get pass from user
-        char* verify_pass = (char*)malloc(32 * sizeof(char));
-
-        testAllocation(verify_pass);
-        printf("Input master password to continue: ");
-        scanf("%32s", verify_pass);
-
-        char* verify_pass2 = (char*)realloc(verify_pass, strlen(verify_pass) * sizeof(char));
-
-        testAllocation(verify_pass2);
-
-        verify_pass = verify_pass2;
-        // get pass from file
-        FILE* mass_file;
-        mass_file = fopen("~/.config/mpa/mass_pass", "r");
-        char* the_truth = (char*)malloc(32 * sizeof(char));
-
-        testAllocation(the_truth);
-
-        the_truth = fgets(the_truth, 32, mass_file);
-        char* truth2 = (char*)realloc(the_truth, strlen(the_truth+1) * sizeof(char));
-
-        testAllocation(truth2);
-
-        the_truth = truth2;
-
-        if (strcmp(verify_pass, the_truth) != 0) {
-                printf("You are not the real person exiting program\n");
-                free(verify_pass);
-                free(the_truth);
+        if (password == NULL) {
+                printf("Could not create password\n");
                 exit(0);
         }
 
-        free(verify_pass);
-        free(the_truth);
-}
-
-void createPassword() {
-        char* name = (char*)malloc(sizeof(char) * BUFFER);
-        char* pwd = (char*)malloc(sizeof(char) * PWD_SIZE);
-
-        testAllocation(name);
-        testAllocation(pwd);
-        printf("Input name for password: ");
-        scanf("%32s", name);
-        testAllocation(name);
-
-        char* name2 = (char*)realloc(name, strlen(name+1) * sizeof(char));
-
-        testAllocation(name2);
-
-        name = name2;
-        const char CHARS[53] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const char NUMS[11] = "1234567890";
-        const char SYMBOLS[11] = "!@#$%^&*()";
-        int random = rand() % 3;
-
-        srand(time(NULL));
-
         for (int i = 0; i < PWD_SIZE; i++) {
-                if (random == 0) {
-                        pwd[i] = CHARS[rand() % 52];
+                switch (random) {
+                case 0:
+                        password[i] = LETTERS[rand() % 52];
                         random = rand() % 3;
-                        continue;
-                } else if (random == 1) {
-                        pwd[i] = NUMS[rand() % 10];
+                        break;
+                case 1:
+                        password[i] = NUMBERS[rand() % 10];
                         random = rand() % 3;
-                        continue;
-                } else if (random == 2) {
-                        pwd[i] = SYMBOLS[rand() % 10];
+                        break;
+                case 2:
+                        password[i] = SPECIALS[rand() % 10];
                         random = rand() % 3;
-                        continue;
+                        break;
                 }
         }
 
-        storePassword(name, pwd);
-}
-
-void deletePassword(int line_num) {
-        char cur_line[BUFFER];
-        int cur_num = 0;
-        FILE* old;
-        FILE* new;
-        old = fopen("~/.config/mpa/passwords", "r");
-        new = fopen("~/.config/mpa/passwords2", "w");
-
-        while (fgets(cur_line, BUFFER, old) != NULL) {
-                cur_num++;
-
-                if (cur_num == line_num)
-                        continue;
-
-                fputs(cur_line, new);
-        }
-
-        fclose(old);
-        fclose(new);
-        remove("~/.config/mpa/passwords");
-        rename("~/.config/mpa/passwords2", "~/.config/mpa/passwords");
+        return password;
 }
 
 void listPasswords() {
-        char pass_file[] = "~/.config/mpa/passwords";
-        char buffer[BUFFER];
+        char* home = getenv("HOME");
+        char cur_line[MAX_STRING];
+        char path[MAX_STRING];
 
-        if (access(pass_file, F_OK) != 0) {
-                printf("File does not exist, please create a password to store\n");
+        if (home == NULL) {
+                printf("Could not read password file\n");
                 exit(0);
         }
 
-        FILE* password_file;
-        password_file = fopen(pass_file, "r");
+        snprintf(path, sizeof(path), "%s/.config/.apmp", home);
 
-        if (password_file == NULL) {
-                printf("Failed to open password file\n");
-                exit(EXIT_FAILURE);
+        if (access(path, F_OK) != 0) {
+                printf("You don't have any passwords to list\n");
+                exit(0);
         }
 
-        while (fgets(buffer, BUFFER, password_file) != NULL) {
-                printf("%s", buffer);
+        FILE* passes = fopen(path, "r");
+
+        if (passes == NULL) {
+                printf("Could not read from password fiel\n");
+                exit(0);
+        };
+
+        while (fgets(cur_line, sizeof(cur_line), passes) != NULL) {
+                printf("%s", cur_line);
         }
 }
 
-void setMasterPassword() {
-        char* master_pass = (char*)malloc(32 * sizeof(char));
+void storePassword(char* name, char* password) {
+        char* home = getenv("HOME");
+        char path[MAX_STRING];
+        char storage[MAX_STRING];
 
-        testAllocation(master_pass);
-        printf("Input a master password: ");
-        scanf("%32s", master_pass);
-
-        char* master_pass2 = (char*)realloc(master_pass, strlen(master_pass+1) * sizeof(char));
-
-        testAllocation(master_pass2);
-        
-        master_pass = master_pass2;
-        FILE* mass_pass;
-        mass_pass = fopen("~/.config/mpa/mass_pass", "w");
-        
-        fputs(master_pass, mass_pass);
-        fclose(mass_pass);
-        free(master_pass);
-}
-
-void storePassword(char* name, char* pwd) {
-        FILE* password_file;
-        password_file = fopen("~/.config/mpa/passwords", "a");
-
-        if (password_file == NULL) {
-                printf("Error storing password, exiting program\n");
-                exit(EXIT_FAILURE);
+        if (home == NULL) {
+                printf("Could not find environment\n");
+                exit(0);
         }
 
-        fputs(name, password_file);
-        fputs(":", password_file);
-        fputs(pwd, password_file);
-        fputs("\n", password_file);
-        fclose(password_file);
-        free(name);
-        free(pwd);
-}
+        snprintf(path, sizeof(path), "%s/.config/.apmp", home);
+        snprintf(storage, sizeof(storage), "%s - %s\n", name, password);
 
-void testAllocation(char* test_var) {
-        if (test_var == NULL) {
-                printf("ERROR, exiting program!\n");
-                exit(EXIT_FAILURE);
+        FILE* passes = fopen(path, "a");
+
+        if (passes == NULL) {
+                printf("Could not open file for storage\n");
+                exit(0);
         }
+
+        fputs(storage, passes);
+        fclose(passes);
+        free(password);
 }
