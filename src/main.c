@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
                 listPasswords();
         } else if (strcmp(argv[1], "--delete") == 0) {
                 int num;
-                char* name = (char*)malloc(MAX_STRING * sizeof(char));
+                char name[MAX_STRING];
 
                 printf("Please input name of password you wish to search for: ");
                 scanf("%s", name);

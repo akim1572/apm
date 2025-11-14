@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #define HOME getenv("HOME")
@@ -10,3 +11,5 @@ char* createPassword();
 int findPassword(char* name);
 void listPasswords();
 void storePassword(char* name, char* password);
+void testAllocation(char* p);
+void testFile(FILE* fp);

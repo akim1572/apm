@@ -12,11 +12,6 @@ char* createPassword() {
         char* password = (char*)malloc(PWD_SIZE * sizeof(char));
         int random = rand() % 3;
 
-        if (password == NULL) {
-                printf("Could not create password\n");
-                exit(0);
-        }
-
         for (int i = 0; i < PWD_SIZE; i++) {
                 switch (random) {
                 case 0:
@@ -38,7 +33,7 @@ char* createPassword() {
 }
 
 int findPassword(char* name) {
-        char buffer[MAX_STRING];
+        char buffer[(int)strlen(name)];
         char cur_line[MAX_STRING];
         char path[MAX_STRING];
         int line_num = 0;
@@ -57,19 +52,16 @@ int findPassword(char* name) {
 
         FILE* passes = fopen(path, "r");
 
-        if (passes == NULL) {
-                printf("Could not read from password fiel\n");
-                exit(0);
-        }
+        testFile(passes);
 
-        while (fgets(cur_line, strlen(name) + 1, passes) != NULL) {
+        while (fgets(cur_line, sizeof(cur_line), passes) != NULL) {
                 line_num++;
 
-                for (int i = 0; i < strlen(name); i++) {
+                for (int i = 0; i < (int)strlen(name); i++) {
                         buffer[i] = cur_line[i];
                 }
 
-                if (strcmp(cur_line, name) == 0) {
+                if (strcmp(buffer, name) == 0) {
                         fclose(passes);
                         return line_num;
                 }
@@ -77,6 +69,18 @@ int findPassword(char* name) {
 
         fclose(passes);
         return 0;
+}
+
+void testAllocation(char* p) {
+        if (p == NULL) {
+                exit(0);
+        }
+}
+
+void testFile(FILE* fp) {
+        if (fp == NULL) {
+                exit(0);
+        }
 }
 
 void listPasswords() {
@@ -97,10 +101,7 @@ void listPasswords() {
 
         FILE* passes = fopen(path, "r");
 
-        if (passes == NULL) {
-                printf("Could not read from password fiel\n");
-                exit(0);
-        };
+        testFile(passes);
 
         while (fgets(cur_line, sizeof(cur_line), passes) != NULL) {
                 printf("%s", cur_line);
@@ -120,12 +121,8 @@ void storePassword(char* name, char* password) {
         snprintf(storage, sizeof(storage), "%s - %s\n", name, password);
 
         FILE* passes = fopen(path, "a");
-
-        if (passes == NULL) {
-                printf("Could not open file for storage\n");
-                exit(0);
-        }
-
+        
+        testFile(passes);
         fputs(storage, passes);
         fclose(passes);
         free(password);
