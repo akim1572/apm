@@ -36,7 +36,15 @@ int main(int argc, char** argv) {
         } else if (strcmp(argv[1], "--list") == 0) {
                 listPasswords();
         } else if (strcmp(argv[1], "--delete") == 0) {
-                // delete password
+                int num;
+                char* name = (char*)malloc(MAX_STRING * sizeof(char));
+
+                printf("Please input name of password you wish to search for: ");
+                scanf("%s", name);
+
+                num = findPassword(name);
+
+                printf("Line num: %d\n", num);
         } else {
                 printf("Not a command use `apm --help` to learn more\n");
                 exit(0);

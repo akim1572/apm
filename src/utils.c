@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "utils.h"
@@ -36,17 +37,58 @@ char* createPassword() {
         return password;
 }
 
-void listPasswords() {
-        char* home = getenv("HOME");
+int findPassword(char* name) {
+        char buffer[MAX_STRING];
         char cur_line[MAX_STRING];
         char path[MAX_STRING];
+        int line_num = 0;
 
-        if (home == NULL) {
-                printf("Could not read password file\n");
+        if (HOME == NULL) {
+                printf("Could not find environment\n");
                 exit(0);
         }
 
-        snprintf(path, sizeof(path), "%s/.config/.apmp", home);
+        snprintf(path, sizeof(path), "%s/%s", HOME, PASS_PATH);
+
+        if (access(path, F_OK) != 0) {
+                printf("You don't have any passwords to list\n");
+                exit(0);
+        }
+
+        FILE* passes = fopen(path, "r");
+
+        if (passes == NULL) {
+                printf("Could not read from password fiel\n");
+                exit(0);
+        }
+
+        while (fgets(cur_line, strlen(name) + 1, passes) != NULL) {
+                line_num++;
+
+                for (int i = 0; i < strlen(name); i++) {
+                        buffer[i] = cur_line[i];
+                }
+
+                if (strcmp(cur_line, name) == 0) {
+                        fclose(passes);
+                        return line_num;
+                }
+        }
+
+        fclose(passes);
+        return 0;
+}
+
+void listPasswords() {
+        char cur_line[MAX_STRING];
+        char path[MAX_STRING];
+
+        if (HOME == NULL) {
+                printf("Could not find environment\n");
+                exit(0);
+        }
+
+        snprintf(path, sizeof(path), "%s/%s", HOME, PASS_PATH);
 
         if (access(path, F_OK) != 0) {
                 printf("You don't have any passwords to list\n");
@@ -66,16 +108,15 @@ void listPasswords() {
 }
 
 void storePassword(char* name, char* password) {
-        char* home = getenv("HOME");
         char path[MAX_STRING];
         char storage[MAX_STRING];
 
-        if (home == NULL) {
+        if (HOME == NULL) {
                 printf("Could not find environment\n");
                 exit(0);
         }
 
-        snprintf(path, sizeof(path), "%s/.config/.apmp", home);
+        snprintf(path, sizeof(path), "%s/%s", HOME, PASS_PATH);
         snprintf(storage, sizeof(storage), "%s - %s\n", name, password);
 
         FILE* passes = fopen(path, "a");
