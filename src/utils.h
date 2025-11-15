@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define HOME getenv("HOME")
 #define MASS_PATH ".config/.apmm"

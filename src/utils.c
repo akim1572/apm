@@ -33,8 +33,8 @@ char* createPassword() {
 }
 
 int findPassword(char* name) {
-        char buffer[(int)strlen(name)];
         char cur_line[MAX_STRING];
+        char buffer[strlen(name)];
         char path[MAX_STRING];
         int line_num = 0;
 
@@ -43,10 +43,10 @@ int findPassword(char* name) {
                 exit(0);
         }
 
-        snprintf(path, sizeof(path), "%s/%s", HOME, PASS_PATH);
+        snprintf(path, sizeof(path), "%s/%s",  HOME, PASS_PATH);
 
         if (access(path, F_OK) != 0) {
-                printf("You don't have any passwords to list\n");
+                printf("No passwords to search for\n");
                 exit(0);
         }
 
@@ -54,12 +54,14 @@ int findPassword(char* name) {
 
         testFile(passes);
 
-        while (fgets(cur_line, sizeof(cur_line), passes) != NULL) {
+        while (fgets(cur_line, MAX_STRING, passes) != NULL) {
                 line_num++;
 
-                for (int i = 0; i < (int)strlen(name); i++) {
+                for (size_t i = 0; i < strlen(name); i++) {
                         buffer[i] = cur_line[i];
                 }
+
+                buffer[strlen(name)] = '\0';
 
                 if (strcmp(buffer, name) == 0) {
                         fclose(passes);
@@ -109,8 +111,9 @@ void listPasswords() {
 }
 
 void storePassword(char* name, char* password) {
+        const int STORAGE_SIZE = ((int)strlen(name) + (int)strlen(password)) + 5;
         char path[MAX_STRING];
-        char storage[MAX_STRING];
+        char storage[STORAGE_SIZE];
 
         if (HOME == NULL) {
                 printf("Could not find environment\n");
@@ -121,7 +124,7 @@ void storePassword(char* name, char* password) {
         snprintf(storage, sizeof(storage), "%s - %s\n", name, password);
 
         FILE* passes = fopen(path, "a");
-        
+
         testFile(passes);
         fputs(storage, passes);
         fclose(passes);

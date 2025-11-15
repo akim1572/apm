@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "utils.h"
 
@@ -22,10 +23,19 @@ int main(int argc, char** argv) {
         } else if (strcmp(argv[1], "--change") == 0) {
                 // change master pass
         } else if (strcmp(argv[1], "--create") == 0) {
+                char path[MAX_STRING];
                 char name[MAX_STRING];
 
+                snprintf(path, sizeof(path), "%s/%s", HOME, PASS_PATH);
                 printf("Input passwords name: ");
-                scanf("%s", name);
+                scanf("%[^\n]", name);
+
+                if (access(path, F_OK) == 0) {
+                        if (findPassword(name)) {
+                                printf("Password name already exists\n");
+                                exit(0);
+                        }
+                }
 
                 srand(time(NULL));
 
@@ -40,7 +50,7 @@ int main(int argc, char** argv) {
                 char name[MAX_STRING];
 
                 printf("Please input name of password you wish to search for: ");
-                scanf("%s", name);
+                scanf("%[^\n]", name);
 
                 num = findPassword(name);
 
