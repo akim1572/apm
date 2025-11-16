@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 
                 num = findPassword(name);
 
-                printf("Line num: %d\n", num);
+                deletePassword(num);
         } else {
                 printf("Not a command use `apm --help` to learn more\n");
                 exit(0);

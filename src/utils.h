@@ -10,6 +10,7 @@
 
 char* createPassword();
 int findPassword(char* name);
+void deletePassword(int line_num);
 void listPasswords();
 void storePassword(char* name, char* password);
 void testAllocation(char* p);

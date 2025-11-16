@@ -9,7 +9,7 @@ char* createPassword() {
         const char LETTERS[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const char NUMBERS[] = "1f234567890";
         const char SPECIALS[] = "!@#$%^&*()";
-        char* password = (char*)malloc(PWD_SIZE * sizeof(char));
+        char* password = (char*)malloc(PWD_SIZE + 1 * sizeof(char));
         int random = rand() % 3;
 
         for (int i = 0; i < PWD_SIZE; i++) {
@@ -29,6 +29,7 @@ char* createPassword() {
                 }
         }
 
+        password[PWD_SIZE] = '\0';
         return password;
 }
 
@@ -73,16 +74,42 @@ int findPassword(char* name) {
         return 0;
 }
 
-void testAllocation(char* p) {
-        if (p == NULL) {
-                exit(0);
-        }
-}
+void deletePassword(int line_num) {
+        char cur_line[MAX_STRING];
+        char path[MAX_STRING];
+        char path2[MAX_STRING];
+        int line = 0;
 
-void testFile(FILE* fp) {
-        if (fp == NULL) {
+        if (HOME == NULL) {
+                printf("Could not find environment\n");
                 exit(0);
         }
+
+        snprintf(path, sizeof(path), "%s/%s",  HOME, PASS_PATH);
+        snprintf(path2, sizeof(path2), "%s/.config/.apm2", HOME);
+
+        FILE* passes;
+        FILE* passes2;
+        passes = fopen(path, "r");
+        passes2 = fopen(path2, "w");
+
+        testFile(passes);
+        testFile(passes2);
+
+        while (fgets(cur_line, MAX_STRING, passes) != NULL) {
+                line++;
+
+                if (line == line_num) {
+                        continue;
+                }
+
+                fputs(cur_line, passes2);
+        }
+
+        fclose(passes);
+        fclose(passes2);
+        remove(path);
+        rename(path2, path);
 }
 
 void listPasswords() {
@@ -111,9 +138,8 @@ void listPasswords() {
 }
 
 void storePassword(char* name, char* password) {
-        const int STORAGE_SIZE = ((int)strlen(name) + (int)strlen(password)) + 5;
         char path[MAX_STRING];
-        char storage[STORAGE_SIZE];
+        char storage[MAX_STRING];
 
         if (HOME == NULL) {
                 printf("Could not find environment\n");
@@ -130,3 +156,16 @@ void storePassword(char* name, char* password) {
         fclose(passes);
         free(password);
 }
+
+void testAllocation(char* p) {
+        if (p == NULL) {
+                exit(0);
+        }
+}
+
+void testFile(FILE* fp) {
+        if (fp == NULL) {
+                exit(0);
+        }
+}
+
