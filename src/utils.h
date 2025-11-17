@@ -9,9 +9,11 @@
 #define MAX_STRING 64
 
 char* createPassword();
+void checkMaster();
 int findPassword(char* name);
 void deletePassword(int line_num);
 void listPasswords();
+void setMaster();
 void storePassword(char* name, char* password);
 void testAllocation(char* p);
 void testFile(FILE* fp);

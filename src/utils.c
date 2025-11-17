@@ -74,6 +74,34 @@ int findPassword(char* name) {
         return 0;
 }
 
+void checkMaster() {
+        char c;
+        char mass_file[MAX_STRING];
+        char pass[MAX_STRING];
+        char test[MAX_STRING];
+
+        printf("Enter master password: ");
+        scanf("%s", test);
+
+        if (HOME == NULL) {
+                printf("Failed init environment\n");
+                exit(0);
+        }
+
+        snprintf(mass_file, sizeof(mass_file), "%s/%s", HOME, MASS_PATH);
+
+        FILE* mass = fopen(mass_file, "r");
+
+        fgets(pass, sizeof(pass), mass);
+
+        if (strcmp(test, pass) != 0) {
+                printf("Wrong password\n");
+                exit(0);
+        }
+
+        c = getc(stdin);
+}
+
 void deletePassword(int line_num) {
         char cur_line[MAX_STRING];
         char path[MAX_STRING];
@@ -135,6 +163,31 @@ void listPasswords() {
         while (fgets(cur_line, sizeof(cur_line), passes) != NULL) {
                 printf("%s", cur_line);
         }
+}
+
+void setMaster() {
+        char mass[MAX_STRING];
+        char path[MAX_STRING];
+
+        printf(
+                "Put in one word password that only you know\n"
+                "You only get one chance at this so make sure you remember: "
+        );
+        scanf("%s", mass);
+
+        if (HOME == NULL) {
+                printf("Could not find environment\n");
+                exit(0);
+        }
+
+        snprintf(path, sizeof(path), "%s/%s", HOME, MASS_PATH);
+
+        FILE* mass_file = fopen(path, "w");
+
+        testFile(mass_file);
+
+        fputs(mass, mass_file);
+        fclose(mass_file);
 }
 
 void storePassword(char* name, char* password) {

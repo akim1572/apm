@@ -12,17 +12,29 @@ int main(int argc, char** argv) {
                 exit(0);
         }
 
+        char mass_file[MAX_STRING];
+
+        if (HOME == NULL) {
+                printf("Failed to find environment\n");
+                exit(0);
+        }
+
+        snprintf(mass_file, sizeof(mass_file), "%s/%s", HOME, MASS_PATH);
+
+        if (access(mass_file, F_OK) != 0) {
+                setMaster();
+        }
+
         if (strcmp(argv[1], "--help") == 0) {
                 printf(
-                        "--help => displays the help screen, this one actually\n"
-                        "--change => changes master password that has already been set\n"
-                        "--create => creates and stores a password\n"
-                        "--list => list passwords that you have had stored\n"
-                        "--delete => delete a password of your choosing\n"
+                        "--help   => displays the help screen, this one actually\n"
+                        "--create =>               creates and stores a password\n"
+                        "--list   =>     list passwords that you have had stored\n"
+                        "--delete =>          delete a password of your choosing\n"
                 );
-        } else if (strcmp(argv[1], "--change") == 0) {
-                // change master pass
         } else if (strcmp(argv[1], "--create") == 0) {
+                checkMaster();
+
                 char path[MAX_STRING];
                 char name[MAX_STRING];
 
@@ -44,8 +56,11 @@ int main(int argc, char** argv) {
                 printf("%s\n", password);
                 storePassword(name, password);
         } else if (strcmp(argv[1], "--list") == 0) {
+                checkMaster();
                 listPasswords();
         } else if (strcmp(argv[1], "--delete") == 0) {
+                checkMaster();
+
                 int num;
                 char name[MAX_STRING];
 
