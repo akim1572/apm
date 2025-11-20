@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,10 +11,14 @@
 
 char* createPassword();
 void checkMaster();
-int findPassword(char* name);
+uint8_t findPassword(char* name);
+void decrypt(char* name);
 void deletePassword(int line_num);
+void encrypt(char* pass);
 void listPasswords();
 void setMaster();
 void storePassword(char* name, char* password);
+void testAccess(char* filename);
 void testAllocation(char* p);
 void testFile(FILE* fp);
+void testHome();

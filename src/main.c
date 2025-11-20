@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,11 +15,7 @@ int main(int argc, char** argv) {
 
         char mass_file[MAX_STRING];
 
-        if (HOME == NULL) {
-                printf("Failed to find environment\n");
-                exit(0);
-        }
-
+        testHome();
         snprintf(mass_file, sizeof(mass_file), "%s/%s", HOME, MASS_PATH);
 
         if (access(mass_file, F_OK) != 0) {
@@ -61,7 +58,7 @@ int main(int argc, char** argv) {
         } else if (strcmp(argv[1], "--delete") == 0) {
                 checkMaster();
 
-                int num;
+                uint8_t num;
                 char name[MAX_STRING];
 
                 printf("Please input name of password you wish to search for: ");

@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,9 +11,9 @@ char* createPassword() {
         const char NUMBERS[] = "1f234567890";
         const char SPECIALS[] = "!@#$%^&*()";
         char* password = (char*)malloc(PWD_SIZE + 1 * sizeof(char));
-        int random = rand() % 3;
+        uint8_t random = rand() % 3;
 
-        for (int i = 0; i < PWD_SIZE; i++) {
+        for (uint8_t i = 0; i < PWD_SIZE; i++) {
                 switch (random) {
                 case 0:
                         password[i] = LETTERS[rand() % 52];
@@ -37,19 +38,11 @@ int findPassword(char* name) {
         char cur_line[MAX_STRING];
         char buffer[strlen(name)];
         char path[MAX_STRING];
-        int line_num = 0;
+        uint8_t line_num = 0;
 
-        if (HOME == NULL) {
-                printf("Could not find environment\n");
-                exit(0);
-        }
-
+        testHome();
         snprintf(path, sizeof(path), "%s/%s",  HOME, PASS_PATH);
-
-        if (access(path, F_OK) != 0) {
-                printf("No passwords to search for\n");
-                exit(0);
-        }
+        testAccess(path);
 
         FILE* passes = fopen(path, "r");
 
@@ -82,12 +75,7 @@ void checkMaster() {
 
         printf("Enter master password: ");
         scanf("%s", test);
-
-        if (HOME == NULL) {
-                printf("Failed init environment\n");
-                exit(0);
-        }
-
+        testHome();
         snprintf(mass_file, sizeof(mass_file), "%s/%s", HOME, MASS_PATH);
 
         FILE* mass = fopen(mass_file, "r");
@@ -106,13 +94,9 @@ void deletePassword(int line_num) {
         char cur_line[MAX_STRING];
         char path[MAX_STRING];
         char path2[MAX_STRING];
-        int line = 0;
+        uint8_t line = 0;
 
-        if (HOME == NULL) {
-                printf("Could not find environment\n");
-                exit(0);
-        }
-
+        testHome();
         snprintf(path, sizeof(path), "%s/%s",  HOME, PASS_PATH);
         snprintf(path2, sizeof(path2), "%s/.config/.apm2", HOME);
 
@@ -144,17 +128,9 @@ void listPasswords() {
         char cur_line[MAX_STRING];
         char path[MAX_STRING];
 
-        if (HOME == NULL) {
-                printf("Could not find environment\n");
-                exit(0);
-        }
-
+        testHome();
         snprintf(path, sizeof(path), "%s/%s", HOME, PASS_PATH);
-
-        if (access(path, F_OK) != 0) {
-                printf("You don't have any passwords to list\n");
-                exit(0);
-        }
+        testAccess(path);
 
         FILE* passes = fopen(path, "r");
 
@@ -174,12 +150,7 @@ void setMaster() {
                 "You only get one chance at this so make sure you remember: "
         );
         scanf("%s", mass);
-
-        if (HOME == NULL) {
-                printf("Could not find environment\n");
-                exit(0);
-        }
-
+        testHome();
         snprintf(path, sizeof(path), "%s/%s", HOME, MASS_PATH);
 
         FILE* mass_file = fopen(path, "w");
@@ -194,11 +165,7 @@ void storePassword(char* name, char* password) {
         char path[MAX_STRING];
         char storage[MAX_STRING];
 
-        if (HOME == NULL) {
-                printf("Could not find environment\n");
-                exit(0);
-        }
-
+        testHome();
         snprintf(path, sizeof(path), "%s/%s", HOME, PASS_PATH);
         snprintf(storage, sizeof(storage), "%s - %s\n", name, password);
 
@@ -208,6 +175,13 @@ void storePassword(char* name, char* password) {
         fputs(storage, passes);
         fclose(passes);
         free(password);
+}
+
+void testAccess(char* filename) {
+        if (access(filename, F_OK) != 0) {
+                printf("No passwords to search for\n");
+                exit(0);
+        }
 }
 
 void testAllocation(char* p) {
@@ -222,3 +196,9 @@ void testFile(FILE* fp) {
         }
 }
 
+void testHome() {
+        if (HOME == NULL) {
+                printf("Could not find environment\n");
+                exit(0);
+        }
+}
